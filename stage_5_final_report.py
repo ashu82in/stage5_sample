@@ -219,6 +219,10 @@ def updateTable_final(df_final):
                 for cell in t.columns[col].cells:
                     if cell.text == "Alert":
                         cell.paragraphs[0].runs[0].font.color.rgb = RGBColor(25,140,25)
+                    elif cell.text == "Alarm":
+                        cell.paragraphs[0].runs[0].font.color.rgb = RGBColor(0,0,255)
+                    elif cell.text == "Emergency":
+                        cell.paragraphs[0].runs[0].font.color.rgb = RGBColor(255,0,0)
                 #     cell.paragraphs[0].paragraph_format.line_spacing = 1.5
                     cell.paragraphs[0].paragraph_format.space_before = Cm(0.25)
                     cell.paragraphs[0].paragraph_format.space_after = Cm(0.25)
@@ -265,6 +269,7 @@ img_num_dict = {}
         
 def save_image(df,up_files):
     global img_num_dict
+    st.write(df)
     img_list = []
     img_num_list = []
     location_dict = []
@@ -272,13 +277,16 @@ def save_image(df,up_files):
         temp_img_list = str(rows[10]).split(",")
         temp_img_list = [t.strip() for t in temp_img_list]
         temp_img_num = str(rows[6]).split("-")
-        temp_img_num = [t.strip() for t in temp_img_num]
-        temp_img_num = [int(t) for t in temp_img_num]
+        temp_img_num = [int(t.strip()) for t in temp_img_num]
+        if len(temp_img_num)>1:
+            temp_img_num = [t for t in range(temp_img_num[0], temp_img_num[1]+1) ]
         temp_loc = rows[4]
         for m in range(len(temp_img_num)):
             location_dict.append(temp_loc)
         img_list = img_list + temp_img_list
         img_num_list = img_num_list + temp_img_num
+    st.write(img_num_list)
+    st.write(img_list)
     
     # st.wire()
     for j in range(len(img_list)):
@@ -304,7 +312,7 @@ def save_image(df,up_files):
         
         
     
-    # st.write(img_num_dict)
+    
          
 def updateTable_new():
     createfile()
