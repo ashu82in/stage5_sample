@@ -669,7 +669,7 @@ if obs_file is not None:
     # st.write(final_col_width)
     
     try:
-        with open("test.docx", "rb") as fp:
+        with open("sample_output.docx", "rb") as fp:
         
             btn_1 = st.button(
                     label="Create New Word File and Update Data in Test Table",
@@ -723,7 +723,7 @@ if obs_file is not None:
         
         if len(missing_img)==0:
             try:
-                with open("test.docx", "rb") as fp:
+                with open("sample_output.docx", "rb") as fp:
                 
                     btn_1 = st.button(
                             label="Create New Word File and Update Data",
@@ -771,18 +771,19 @@ if obs_file is not None:
             df_loc_final = df_loc_final.sort_values(by=["Location"])
             # st.write(df_loc_final)
             location_list = list(set(df_loc_final["Location"]))
-            location_order = [0 for i in range(len(location_list))]
+            location_order = [i+1 for i in range(len(location_list))]
             loc_order_dict = {"Location" : location_list,
-                              "Location Order": location_order}
+                              "Location Order": 0}
             df_location = pd.DataFrame(loc_order_dict)
             df_location = df_location.sort_values(by=["Location"])
-            
+            df_location["Location Order"] = location_order
+            # st.write(df_location)
             st.write("Please select the order of the location for the report")
             df_location = st.data_editor(
                     df_location,
                     column_config={
                         "Location Order": st.column_config.NumberColumn(
-                            "Order in Word",
+                            "Order of Table in Word",
                             help="The order in which the table will be added to word",
                             min_value=1,
                             max_value=len(location_list),
@@ -905,7 +906,22 @@ if obs_file is not None:
                             ctr_temp =  ctr_temp + 1
                     
                     # st.write(df_loc_final)   
-                    updateLocationWordDoc()
+                    # updateLocationWordDoc()
+                    
+                    if len(missing_img)==0:
+                        try:
+                            with open("location_output.docx", "rb") as fp:
+                            
+                                btn_1 = st.button(
+                                        label="Create New Word File for Location and Update Data",
+                                        on_click=updateLocationWordDoc       
+                                    )
+                        except:
+                            pass
+                    
+                    
+                    
+                    
                      
                     try:
                         with open("location_output.docx", "rb") as fp:
