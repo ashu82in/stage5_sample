@@ -38,6 +38,9 @@ state = session_state
 if "key" not in state:
     state["key"] = str(randint(1000, 100000000))
 
+if "photo_saved" not in state:
+    state["photo_saved"] = False
+
 
 
 try:
@@ -59,7 +62,9 @@ def createfile():
     section.page_height = new_height
     section.left_margin = Cm(1)
     section.right_margin = Cm(1)
+    section.bottom_margin = Cm(1)
     document.save("sample_output.docx")
+    state["photo_saved"] = False
     
 
 def createfile_location():
@@ -70,7 +75,7 @@ def createfile_location():
     section.page_width = new_width
     section.page_height = new_height
     section.left_margin = Cm(1)
-    section.right_margin = Cm(1)
+    section.right_margin = Cm(0.75)
     document.save("location_output.docx")
 
 
@@ -134,7 +139,7 @@ def allowDocumentBreak(document):
         
         
         
-def updateTable_final(df_final):
+def updateTable_final(df_final, test):
     global df2
     global final_col_width
     doc = docx.Document('sample_output.docx')
@@ -261,11 +266,18 @@ def updateTable_final(df_final):
            
     
     allowDocumentBreak(doc)
-    # doc.add_page_break()
+    if test == True:
+        doc.add_page_break()
     doc.save('./sample_output.docx')   
 
 
 img_num_dict = {}
+
+
+
+def change_state():
+    if state["photo_saved"] == True:
+        state["photo_saved"] == False
         
 def save_image(df,up_files):
     global img_num_dict
@@ -309,8 +321,21 @@ def save_image(df,up_files):
                 im2.save("images_comp_audit/"+new_file_name)
                 
                 
-        
-        
+def update_test_table():
+    createfile()
+    global df2
+    global up_files
+    section_report = set(df2["Section"])
+    for i in section_report:
+        df3 = df2[df2["Section"] == i]
+        no_of_images = sum(list(df3["No of Images"]))
+        # st.write("no of image" + str(no_of_images))
+        df3 = df3.drop(["No of Images"], axis=1)
+        df4 = df3.copy(deep=True)
+        df3 = df3.iloc[:, :-2]
+        # st.write(df3)
+        updateTable_final(df3, True)
+        # updateImage(df4, no_of_images, up_files)  
     
     
          
@@ -318,7 +343,7 @@ def updateTable_new():
     createfile()
     updateWordDoc()
         
-        
+ 
         
 def updateWordDoc():
     global df2
@@ -332,7 +357,7 @@ def updateWordDoc():
         df4 = df3.copy(deep=True)
         df3 = df3.iloc[:, :-2]
         # st.write(df3)
-        updateTable_final(df3)
+        updateTable_final(df3, False)
         updateImage(df4, no_of_images, up_files)
 
 
@@ -399,9 +424,9 @@ def updateImage(df3, no_of_images, up_files):
         # st.write(image_file_name)
         # st.write(im_width, im_height)
         if im_width>=im_height:
-            picture = cell.add_paragraph().add_run().add_picture('images_comp_audit/'+image_file_name, width=Cm(8.25))
+            picture = cell.add_paragraph().add_run().add_picture('images_comp_audit/'+image_file_name, width=Cm(7))
         else:
-            picture = cell.add_paragraph().add_run().add_picture('images_comp_audit/'+image_file_name, height=Cm(8.25))
+            picture = cell.add_paragraph().add_run().add_picture('images_comp_audit/'+image_file_name, height=Cm(7))
         cell = table.rows[row_no+1].cells[col_no]
         # cell = table.rows[counter+1].cells[counter_cols]
         # st.write(row_no, col_no)
@@ -592,7 +617,7 @@ def updateImageLocation(df3, no_of_images, up_files):
 
 ### Main Page Starts from here
 st.write("Upload Optimized Observation")
-obs_file = st.file_uploader("Upload Observation Excel File", type=['csv','xlsx'],accept_multiple_files=False,key="fileUploader", on_change=createfile)
+obs_file = st.file_uploader("Upload Observation Excel File", type=['csv','xlsx'],accept_multiple_files=False,key="fileUploader")
 if obs_file is not None:
     # uplaod remedy file
     df_rem = pd.read_excel("remedy_excel.xlsx")
@@ -643,9 +668,32 @@ if obs_file is not None:
     st.write("Total Column Width: "+ str(total_width))
     # st.write(final_col_width)
     
+    try:
+        with open("test.docx", "rb") as fp:
+        
+            btn_1 = st.button(
+                    label="Create New Word File and Update Data in Test Table",
+                    on_click=update_test_table      
+                )
+    except:
+        pass
+    
+    try:
+        with open("sample_output.docx", "rb") as fp:
+        
+            btn_1 = st.download_button(
+                    label="Download Test Word File",
+                    data=fp,
+                    file_name="sample_output",
+                    mime="docx"
+                    )
+    except:
+        pass
     
     
-    up_files = st.file_uploader("Upload Image Files", type = ["png", "jpeg", "jpg"] ,accept_multiple_files=True, key=state["key"])
+    
+    
+    up_files = st.file_uploader("Upload Image Files", type = ["png", "jpeg", "jpg"] ,accept_multiple_files=True, key=state["key"], on_change=change_state)
     all_file_found = False
     if len(up_files)>=0:
         file_name_list = []
@@ -662,8 +710,9 @@ if obs_file is not None:
         
         if len(missing_img)>0:
             st.write("The following images are missing: ", str(missing_img))
-        elif len(up_files)>0 and len(missing_img)==0:
+        elif len(up_files)>0 and len(missing_img)==0 and state["photo_saved"] == False:
             save_image(df,up_files)
+            state["photo_saved"] == True
             
         
             
