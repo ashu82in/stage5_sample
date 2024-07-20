@@ -73,7 +73,10 @@ def createfile():
         document.save("sample_output.docx")
         state["photo_saved"] = False
         state["sample_file"] = True
-    
+
+
+
+
     
 
 def createfile_location():
@@ -757,15 +760,15 @@ if obs_file is not None:
             
             
             
-            try:
-                with open("sample_output.docx", "rb") as fp:
+            # try:
+            #     with open("sample_output.docx", "rb") as fp:
                 
-                    btn_1 = st.button(
-                            label="Update Word File",
-                            on_click=updateWordDoc,       
-                        )
-            except:
-                pass
+            #         btn_1 = st.button(
+            #                 label="Update Word File",
+            #                 on_click=updateWordDoc,       
+            #             )
+            # except:
+            #     pass
             
             
             try:
