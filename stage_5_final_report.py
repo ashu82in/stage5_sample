@@ -90,6 +90,9 @@ def createfile_location():
         state["location_file"] = True
 
 
+
+
+
 def set_column_width(column, width):
     for cell in column.cells:
         cell.width = width
@@ -679,6 +682,10 @@ if obs_file is not None:
     st.write("Total Column Width: "+ str(total_width))
     # st.write(final_col_width)
     
+    if state["sample_file"] == False:
+        createfile()
+    
+    
     try:
         with open("sample_output.docx", "rb") as fp:
         
@@ -733,6 +740,10 @@ if obs_file is not None:
     
         
         if len(missing_img)==0:
+            if state["sample_file"] == False:
+                createfile()
+            
+            
             try:
                 with open("sample_output.docx", "rb") as fp:
                 
@@ -920,6 +931,10 @@ if obs_file is not None:
                     # updateLocationWordDoc()
                     
                     if len(missing_img)==0:
+                        if state["location_file"] == False:
+                            createfile_location()
+                        
+                        
                         try:
                             with open("location_output.docx", "rb") as fp:
                             
