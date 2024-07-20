@@ -131,7 +131,7 @@ def row_position(df_final):
     row_positions  = []
     item_obs = df_final["Element"] + df_final["Observations"]
     item_obs_list = list(item_obs)
-    for i,j in item_obs.value_counts().iteritems():
+    for i,j in item_obs.value_counts().items():
         identical_rows_dict[i] = j
     #         print(row_positions[-1])
         start_pos = item_obs_list.index(i) + 1
