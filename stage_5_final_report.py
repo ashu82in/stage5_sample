@@ -48,17 +48,25 @@ if "sample_file" not in state:
 if "location_file" not in state:
     state["location_file"] = False
 
+if "page_first_loaded" not in state:
+    state["page_first_loaded"] = True
+    
 
-try:
-    shutil.rmtree("images_comp_audit")
-except:
-    pass
-
-try:
-    os.mkdir("images_comp_audit")
-except:
-    pass
-
+if state["page_first_loaded"] == True:
+    
+    try:
+        shutil.rmtree("images_comp_audit")
+    except:
+        pass
+    
+    try:
+        os.mkdir("images_comp_audit")
+    except:
+        pass
+    
+    state["page_first_loaded"] == False
+    
+    
 def createfile():
     if state["sample_file"] == False:
         document = Document()
