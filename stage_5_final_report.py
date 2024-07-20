@@ -41,6 +41,12 @@ if "key" not in state:
 if "photo_saved" not in state:
     state["photo_saved"] = False
 
+if "sample_file" not in state:
+    state["sample_file"] = False
+    
+    
+if "location_file" not in state:
+    state["location_file"] = False
 
 
 try:
@@ -54,29 +60,34 @@ except:
     pass
 
 def createfile():
-    document = Document()
-    section = document.sections[0]
-    section.orientation = WD_ORIENT.LANDSCAPE
-    new_width, new_height = section.page_height, section.page_width
-    section.page_width = new_width
-    section.page_height = new_height
-    section.left_margin = Cm(1)
-    section.right_margin = Cm(1)
-    section.bottom_margin = Cm(1)
-    document.save("sample_output.docx")
-    state["photo_saved"] = False
+    if state["sample_file"] == False:
+        document = Document()
+        section = document.sections[0]
+        section.orientation = WD_ORIENT.LANDSCAPE
+        new_width, new_height = section.page_height, section.page_width
+        section.page_width = new_width
+        section.page_height = new_height
+        section.left_margin = Cm(1)
+        section.right_margin = Cm(1)
+        section.bottom_margin = Cm(1)
+        document.save("sample_output.docx")
+        state["photo_saved"] = False
+        state["sample_file"] = True
+    
     
 
 def createfile_location():
-    document = Document()
-    section = document.sections[0]
-    section.orientation = WD_ORIENT.LANDSCAPE
-    new_width, new_height = section.page_height, section.page_width
-    section.page_width = new_width
-    section.page_height = new_height
-    section.left_margin = Cm(1)
-    section.right_margin = Cm(0.75)
-    document.save("location_output.docx")
+    if state["location_file"] == False:
+        document = Document()
+        section = document.sections[0]
+        section.orientation = WD_ORIENT.LANDSCAPE
+        new_width, new_height = section.page_height, section.page_width
+        section.page_width = new_width
+        section.page_height = new_height
+        section.left_margin = Cm(1)
+        section.right_margin = Cm(0.75)
+        document.save("location_output.docx")
+        state["location_file"] = True
 
 
 def set_column_width(column, width):
