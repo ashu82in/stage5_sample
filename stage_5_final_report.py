@@ -26,7 +26,7 @@ import random
 from random import randint
 from streamlit import session_state
 from docx.enum.text import WD_LINE_SPACING, WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_ALIGN_VERTICAL
+from docx.enum.table import WD_ALIGN_VERTICAL, WD_TABLE_ALIGNMENT
 from docx.shared import RGBColor
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -144,6 +144,25 @@ def set_cell_border(cell, **kwargs):
             for key in ["sz", "val", "color", "space", "shadow"]:
                 if key in edge_data:
                     element.set(qn('w:{}'.format(key)), str(edge_data[key]))
+                    
+def set_rows_cant_split(row):
+    tr = row._tr
+    cantSplits = tr.xpath("./w:trPr/w:cantSplit")
+    if cantSplits:
+        cantSplit = cantSplits[0]
+        cantSplit.set(qn('w:val'), 'true')
+        return
+    
+    
+def set_repeat_table_header(row):
+    """ set repeat table row on every new page
+    """
+    tr = row._tr
+    trPr = tr.get_or_add_trPr()
+    tblHeader = OxmlElement('w:tblHeader')
+    tblHeader.set(qn('w:val'), "true")
+    trPr.append(tblHeader)
+    return row
 
 def row_position(df_final):
     # df_final= df2
@@ -308,6 +327,12 @@ def updateTable_final(df_final, test):
             #                 end={"sz": 6, "color": "#000000", "val": "single"},
             #             )
            
+    t.alignment = WD_TABLE_ALIGNMENT.CENTER
+    set_repeat_table_header(t.rows[0])
+    for row in t.rows:
+        set_rows_cant_split(row)
+        
+        
     
     state["row_no"] = state["row_no"] + len(st_points_list)
     allowDocumentBreak(doc)
@@ -353,6 +378,7 @@ def save_image(df,up_files):
         file_name  =file.name
         ext_name =  file_name.split(".")[-1]
         im2 = Image.open(file)
+        im2 = ImageOps.expand(im2, border=3)  #Add border to the images
         for img_t in img_list:
             if img_t in file_name:
                 loc_name = img_num_dict[img_t][1]
@@ -368,6 +394,7 @@ def save_image(df,up_files):
                 
 def update_test_table():
     createfile()
+    state["row_no"] = 1
     global df2
     global up_files
     section_report = set(df2["Section"])
@@ -386,6 +413,7 @@ def update_test_table():
     
          
 def updateTable_new():
+    state["row_no"] = 1
     createfile()
     updateWordDoc()
         
@@ -491,6 +519,7 @@ def updateImage(df3, no_of_images, up_files):
             # table.add_row()
             counter_cols = 0
             counter = counter+2
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
     for col in table.columns:
         for cell in col.cells:
             for para in cell.paragraphs:
@@ -582,6 +611,12 @@ def upadateLocationTable(df_final_2, loc_temp):
     
         row_positions = row_position(df_final_2)
     # doc.add_page_break()
+    t.alignment = WD_TABLE_ALIGNMENT.CENTER
+    set_repeat_table_header(t.rows[0])
+    for row in t.rows:
+        set_rows_cant_split(row)
+    
+    
     doc.save('./location_output.docx')  
     
 
