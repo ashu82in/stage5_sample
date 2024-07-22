@@ -34,6 +34,9 @@ from streamlit import session_state
 
 st.set_page_config(layout="wide")
 
+
+
+
 state = session_state
 if "key" not in state:
     state["key"] = str(randint(1000, 100000000))
@@ -51,6 +54,11 @@ if "location_file" not in state:
 if "page_first_loaded" not in state:
     state["page_first_loaded"] = True
     
+if "row_no" not in state:
+    state["row_no"] = 1
+
+    
+
 
 if state["page_first_loaded"] == True:
     
@@ -64,11 +72,10 @@ if state["page_first_loaded"] == True:
     except:
         pass
     
-    state["page_first_loaded"] == False
+    state["page_first_loaded"] = False
     
     
 def createfile():
-    if state["sample_file"] == False:
         document = Document()
         section = document.sections[0]
         section.orientation = WD_ORIENT.LANDSCAPE
@@ -97,6 +104,7 @@ def createfile_location():
         section.page_height = new_height
         section.left_margin = Cm(1)
         section.right_margin = Cm(0.75)
+        section.bottom_margin = Cm(1)
         document.save("location_output.docx")
         state["location_file"] = True
 
@@ -163,7 +171,6 @@ def allowDocumentBreak(document):
         tag.append(child)  # Append in the new tag
         
         
-        
 def updateTable_final(df_final, test):
     global df2
     global final_col_width
@@ -205,9 +212,15 @@ def updateTable_final(df_final, test):
         for j in range(df_final.shape[-1]):
             t.cell(i+1,j).text = str(df_final.values[i,j])
     
-    
+    # st.write(df_final)
     row_positions = row_position(df_final)
     # st.write(row_positions)
+    
+    st_points_list = [i[0] for i in row_positions]
+    st_points_list.sort()
+    sort_dict = {st_points_list[i]: i for i in range(len(st_points_list))}
+    
+    
     for row_no in row_positions:
         # st.write(row_no)
         st_pos = row_no[0]
@@ -225,6 +238,8 @@ def updateTable_final(df_final, test):
                 c.text = ""
                 A = a.merge(c)
                 A.text = temp_content
+                if i == 0:
+                    A.text = str(state["row_no"] + sort_dict[st_pos])
             for col in [4,5,6]:
                  for row in range(st_pos,end_pos+1):
                      temp_cell = t.cell(row, col)
@@ -245,6 +260,9 @@ def updateTable_final(df_final, test):
                              end={"sz": 6, "color": "#000000", "val": "single"},
                          )
             # add font color to Category
+        else:
+            a = t.cell(st_pos, 0)
+            a.text = str(state["row_no"] + sort_dict[st_pos])
         for col in [4,5,6]:
                 for cell in t.columns[col].cells:
                     if cell.text == "Alert":
@@ -290,6 +308,7 @@ def updateTable_final(df_final, test):
             #             )
            
     
+    state["row_no"] = state["row_no"] + len(st_points_list)
     allowDocumentBreak(doc)
     if test == True:
         doc.add_page_break()
@@ -322,8 +341,8 @@ def save_image(df,up_files):
             location_dict.append(temp_loc)
         img_list = img_list + temp_img_list
         img_num_list = img_num_list + temp_img_num
-    st.write(img_num_list)
-    st.write(img_list)
+    # st.write(img_num_list)
+    # st.write(img_list)
     
     # st.wire()
     for j in range(len(img_list)):
@@ -351,6 +370,7 @@ def update_test_table():
     global df2
     global up_files
     section_report = set(df2["Section"])
+    state["row_no"] =1
     for i in section_report:
         df3 = df2[df2["Section"] == i]
         no_of_images = sum(list(df3["No of Images"]))
@@ -465,7 +485,7 @@ def updateImage(df3, no_of_images, up_files):
             counter = counter+2
     doc.add_page_break()
     doc.save('./sample_output.docx')  
-st.title("Stage 5 - Final Report Preperation")
+
 
 
 def updateLocationTable():
@@ -639,7 +659,7 @@ def updateImageLocation(df3, no_of_images, up_files):
     doc.add_page_break()
     doc.save('./location_output.docx')  
 
-
+st.title("Stage 5 - Final Report Preperation")
 ### Main Page Starts from here
 st.write("Upload Optimized Observation")
 obs_file = st.file_uploader("Upload Observation Excel File", type=['csv','xlsx'],accept_multiple_files=False,key="fileUploader")
@@ -960,17 +980,17 @@ if obs_file is not None:
                     
                     
                      
-                    try:
-                        with open("location_output.docx", "rb") as fp:
-                        
-                            btn_1 = st.download_button(
-                                    label="Download Location Word File",
-                                    data=fp,
-                                    file_name="location_output",
-                                    mime="docx"
-                                    )
-                    except:
-                        pass
+                        try:
+                            with open("location_output.docx", "rb") as fp:
+                            
+                                btn_1 = st.download_button(
+                                        label="Download Location Word File",
+                                        data=fp,
+                                        file_name="location_output",
+                                        mime="docx"
+                                        )
+                        except:
+                            pass
                     
                 
             # try:
