@@ -85,6 +85,7 @@ def createfile():
         section.left_margin = Cm(1)
         section.right_margin = Cm(1)
         section.bottom_margin = Cm(1)
+        section.top_margin = Cm(4)
         document.save("sample_output.docx")
         state["photo_saved"] = False
         state["sample_file"] = True
@@ -411,6 +412,13 @@ def updateImage(df3, no_of_images, up_files):
     doc.add_heading("Images", 2)
     no_of_rows = int(((no_of_images-1)//3+1)*2)   ## 3 is no of columns
     table = doc.add_table(rows = no_of_rows , cols = 3)
+    # test
+    for col in table.columns:
+        for cell in col.cells:
+            for para in cell.paragraphs:
+                para.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            
     ctr_temp = 0
     # for row in table.rows:
     #     if ctr_temp %2 ==0:
@@ -469,9 +477,9 @@ def updateImage(df3, no_of_images, up_files):
         # st.write(image_file_name)
         # st.write(im_width, im_height)
         if im_width>=im_height:
-            picture = cell.add_paragraph().add_run().add_picture('images_comp_audit/'+image_file_name, width=Cm(7))
+            picture = cell.add_paragraph().add_run().add_picture('images_comp_audit/'+image_file_name, width=Cm(6.5))
         else:
-            picture = cell.add_paragraph().add_run().add_picture('images_comp_audit/'+image_file_name, height=Cm(7))
+            picture = cell.add_paragraph().add_run().add_picture('images_comp_audit/'+image_file_name, height=Cm(6.5))
         cell = table.rows[row_no+1].cells[col_no]
         # cell = table.rows[counter+1].cells[counter_cols]
         # st.write(row_no, col_no)
@@ -483,6 +491,10 @@ def updateImage(df3, no_of_images, up_files):
             # table.add_row()
             counter_cols = 0
             counter = counter+2
+    for col in table.columns:
+        for cell in col.cells:
+            for para in cell.paragraphs:
+                para.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
     doc.add_page_break()
     doc.save('./sample_output.docx')  
 
@@ -566,7 +578,7 @@ def upadateLocationTable(df_final_2, loc_temp):
                     cell.paragraphs[0].paragraph_format.space_after = Cm(0.3)
                     cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
                     if col in [0,1,4,5,6]:
-                        cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+                        cell.paragraphs[0].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
     
         row_positions = row_position(df_final_2)
     # doc.add_page_break()
@@ -733,7 +745,7 @@ if obs_file is not None:
             btn_1 = st.download_button(
                     label="Download Test Word File",
                     data=fp,
-                    file_name="sample_output",
+                    file_name="sample_output.docx",
                     mime="docx"
                     )
     except:
@@ -805,7 +817,7 @@ if obs_file is not None:
                     btn_1 = st.download_button(
                             label="Download Word File",
                             data=fp,
-                            file_name="sample_output",
+                            file_name="sample_output.docx",
                             mime="docx"
                             )
             except:
