@@ -461,7 +461,11 @@ def updateImage(df3, no_of_images, up_files):
     image_location_dict = {}
     img_list = []
     for j in range(len(image_list)):
-        temp_str_list = image_list[j].split("-")
+        try:
+            temp_str_list = image_list[j].split("-")
+        except:
+            temp_data_int_to_str = str(image_list[j])
+            temp_str_list = temp_data_int_to_str.split("-")
         temp_loc = location_list[j]
         if len(temp_str_list) == 1:
             temp_start_pt =  int(temp_str_list[0])
