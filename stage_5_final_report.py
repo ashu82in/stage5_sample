@@ -372,7 +372,7 @@ def save_image(df,up_files):
     
     # st.wire()
     for j in range(len(img_list)):
-        img_num_dict[img_list[j]] = [img_num_list[j], temp_loc]
+        img_num_dict[img_list[j]] = [img_num_list[j], location_dict[j]]
     
     for file in up_files:
         file_name  =file.name
@@ -387,6 +387,7 @@ def save_image(df,up_files):
                 for m in loc_name_list:
                     new_loc_name = new_loc_name + str(m)
                 new_file_name = "Img "+ str(img_num_dict[img_t][0]) + " @@@" + new_loc_name + "."+ ext_name
+                new_file_name = new_file_name.replace("/", "&&&")
                 img_num_dict[img_t].append(new_file_name)
                 img_num_dict[img_t].append(file_name)
                 im2.save("images_comp_audit/"+new_file_name)
